@@ -351,6 +351,67 @@ app.get('/detalles', function (req, res) {
     });
 })
 
+//Agregar tipo
+app.post('/agregartipo', function (req, res) {
+    let datosTipo = {
+        tipo: req.body.tipo,
+        imageUrl: req.body.imageUrl
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO tipo SET ?", datosTipo, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar el tipo"});
+            } else {
+                res.status(201).json({"Mensaje": "Tipo insertado correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar tipo
+app.delete('/borrart/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM tipo WHERE id_tipo = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar tipo
+app.put('/actualizart/:id', (req, res) =>{
+    let id = req.params.id;
+    let tipo = req.body;
+    console.log(id);
+    console.log(tipo);
+    if (!id || !tipo){
+        return res.status(400).send({error: tipo, message: 'Debe proveer un id y los datos de un tipo'});
+    }
+    mc.query("UPDATE tipo SET ? WHERE id_tipo = ?", [tipo, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todos los tipos
+app.get('/tipo', function (req, res) {
+    mc.query('SELECT * FROM tipo', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de tipos pedido.'
+        });
+    });
+})
+
 app.get('/',(req,res,next) => {
     res.status(200).json({
         ok:true,
