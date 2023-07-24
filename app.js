@@ -42,7 +42,7 @@ app.post('/agregarproducto', function (req, res) {
 });
 
 //Borrar producto
-app.delete('/borrarp/:id', function (req, res){
+app.delete('/borrarproducto/:id', function (req, res){
     let id = req.params.id;
     if(mc){
         console.log(id);
@@ -58,7 +58,7 @@ app.delete('/borrarp/:id', function (req, res){
 });
 
 //Actualizar producto
-app.put('/actualizarp/:id', (req, res) =>{
+app.put('/actualizarproducto/:id', (req, res) =>{
     let id = req.params.id;
     let producto = req.body;
     console.log(id);
@@ -122,7 +122,7 @@ app.post('/agregardiseno', function (req, res) {
 });
 
 //Borrar diseño
-app.delete('/borrard/:id', function (req, res){
+app.delete('/borrardiseno/:id', function (req, res){
     let id = req.params.id;
     if(mc){
         console.log(id);
@@ -138,7 +138,7 @@ app.delete('/borrard/:id', function (req, res){
 });
 
 //Actualizar diseño
-app.put('/actualizard/:id', (req, res) =>{
+app.put('/actualizardiseno/:id', (req, res) =>{
     let id = req.params.id;
     let diseno = req.body;
     console.log(id);
@@ -412,10 +412,132 @@ app.get('/tipo', function (req, res) {
     });
 })
 
+//Agregar base
+app.post('/agregarbase', function (req, res) {
+    let datosBase = {
+        tipo_id: req.body.tipo_id,
+        talla_id: req.body.talla_id,
+        color_id: req.body.color_id
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO base SET ?", datosBase, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar la base"});
+            } else {
+                res.status(201).json({"Mensaje": "Base insertada correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar base
+app.delete('/borrarb/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM base WHERE id_base = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar base
+app.put('/actualizarb/:id', (req, res) =>{
+    let id = req.params.id;
+    let base = req.body;
+    console.log(id);
+    console.log(base);
+    if (!id || !base){
+        return res.status(400).send({error: base, message: 'Debe proveer un id y los datos de una base'});
+    }
+    mc.query("UPDATE base SET ? WHERE id_base = ?", [base, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todas las bases
+app.get('/base', function (req, res) {
+    mc.query('SELECT * FROM base', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de bases pedida.'
+        });
+    });
+})
+
+//Agregar talla
+app.post('/agregartalla', function (req, res) {
+    let datosTalla = {
+        talla: req.body.talla
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO talla SET ?", datosTalla, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar la talla"});
+            } else {
+                res.status(201).json({"Mensaje": "Talla insertada correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar base
+app.delete('/borrart/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM talla WHERE id_talla = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar base
+app.put('/actualizart/:id', (req, res) =>{
+    let id = req.params.id;
+    let talla = req.body;
+    console.log(id);
+    console.log(talla);
+    if (!id || !talla){
+        return res.status(400).send({error: talla, message: 'Debe proveer un id y los datos de una talla'});
+    }
+    mc.query("UPDATE talla SET ? WHERE id_talla = ?", [talla, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todas las tallas
+app.get('/talla', function (req, res) {
+    mc.query('SELECT * FROM talla', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de tallas pedida.'
+        });
+    });
+})
+
 app.get('/',(req,res,next) => {
     res.status(200).json({
         ok:true,
-        mensaje: 'Peticion reañizada correctamente'
+        mensaje: 'Peticion realizada correctamente'
     })
 });
 
