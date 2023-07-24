@@ -121,7 +121,7 @@ app.post('/agregardiseno', function (req, res) {
     }
 });
 
-//Borrar producto
+//Borrar diseño
 app.delete('/borrard/:id', function (req, res){
     let id = req.params.id;
     if(mc){
@@ -137,7 +137,7 @@ app.delete('/borrard/:id', function (req, res){
     }
 });
 
-//Actualizar diseno
+//Actualizar diseño
 app.put('/actualizard/:id', (req, res) =>{
     let id = req.params.id;
     let diseno = req.body;
@@ -160,6 +160,193 @@ app.get('/diseno', function (req, res) {
             error: false,
             data: results,
             message: 'Lista de diseños.'
+        });
+    });
+})
+
+//Agregar color
+app.post('/agregarcolor', function (req, res) {
+    let datosColor = {
+        color: req.body.color
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO color SET ?", datosColor, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar el color"});
+            } else {
+                res.status(201).json({"Mensaje": "Color insertado correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar color
+app.delete('/borrarc/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM color WHERE id_color = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar color
+app.put('/actualizarc/:id', (req, res) =>{
+    let id = req.params.id;
+    let color = req.body;
+    console.log(id);
+    console.log(color);
+    if (!id || !color){
+        return res.status(400).send({error: color, message: 'Debe proveer un id y los datos de un color'});
+    }
+    mc.query("UPDATE color SET ? WHERE id_color = ?", [color, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todos los colores
+app.get('/color', function (req, res) {
+    mc.query('SELECT * FROM color', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de colores.'
+        });
+    });
+})
+
+//Agregar pedido
+app.post('/agregarpedido', function (req, res) {
+    let datosPedido = {
+        detalles_pedido_id: req.body.detalles_pedido_id,
+        fecha: req.body.fecha,
+        estado: req.body.estado
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO pedidos SET ?", datosPedido, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar el pedido"});
+            } else {
+                res.status(201).json({"Mensaje": "Pedido insertado correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar pedido
+app.delete('/borrarp/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM pedidos WHERE id_pedido = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar pedido
+app.put('/actualizarp/:id', (req, res) =>{
+    let id = req.params.id;
+    let pedido = req.body;
+    console.log(id);
+    console.log(pedido);
+    if (!id || !pedido){
+        return res.status(400).send({error: pedido, message: 'Debe proveer un id y los datos de un pedido'});
+    }
+    mc.query("UPDATE pedidos SET ? WHERE id_pedido = ?", [pedido, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todos los pedidos
+app.get('/pedidos', function (req, res) {
+    mc.query('SELECT * FROM pedidos', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de pedidos.'
+        });
+    });
+})
+
+//Agregar detalles pedido
+app.post('/agregardetalles', function (req, res) {
+    let datosDetalles = {
+        producto_id: req.body.producto_id,
+        nombre: req.body.nombre,
+        rut: req.body.rut,
+        direccion: req.body.direccion,
+        telefono: req.body.telefono,
+        correo: req.body.correo
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO detallespedido SET ?", datosDetalles, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar el detalle"});
+            } else {
+                res.status(201).json({"Mensaje": "Detalle insertado correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar detalle
+app.delete('/borrard/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM detallespedido WHERE id_detalles_pedido = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar detalle
+app.put('/actualizard/:id', (req, res) =>{
+    let id = req.params.id;
+    let detalle = req.body;
+    console.log(id);
+    console.log(detalle);
+    if (!id || !detalle){
+        return res.status(400).send({error: detalle, message: 'Debe proveer un id y los datos de un detalle'});
+    }
+    mc.query("UPDATE detallespedido SET ? WHERE id_detalles_pedido = ?", [detalle, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todos los pedidos
+app.get('/detalles', function (req, res) {
+    mc.query('SELECT * FROM detallespedido', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de detalles pedido.'
         });
     });
 })
