@@ -9,6 +9,16 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+//CORS Middleware
+app.use(function(req, res, next){
+    //Enabling CORS
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Aceess-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers",
+                    "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
+    next();
+});
+
 //Configuracion de la conexion
 const mc = mysql.createConnection({
     host: 'localhost',
