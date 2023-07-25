@@ -3,12 +3,14 @@ var express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 var bcrypt = require('bcrypt');
+const fileUpload = require('express-fileupload');
 
 //Inicializar variables
 var app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(fileUpload());
 
 //CORS Middleware
 app.use(function(req, res, next){
@@ -544,6 +546,38 @@ app.get('/talla', function (req, res) {
         });
     });
 })
+
+//Login
+app.post('/login', (req, res) => {
+    var body = req.body;
+    mc.query("SELECT * FROM usuario WHERE correo = ?", body.correo, function(error, results, fields){
+        if(error){
+            return res.status(500).json({
+                ok:false,
+                mensaje: 'Error al buscar usuario',
+                errors: error
+            }); 
+        }
+        if(!results.length){
+            return res.status(400).json({
+                ok:false,
+                mensaje: 'Credenciales incorrectas - correo',
+                errors: error
+            });
+        }
+        console.log(results);
+        if(!bcrypt.compareSync(body.clave, results[0].clave)){
+            return res.status(400).json({
+                ok:false, mensaje: 'Credenciales incorrectas - clave', errors: error
+            });
+        }
+        res.status(200).json({
+            ok:true,
+            usuario:results,
+            id: results[0].id_usuario
+        })
+    });
+});
 
 //Añadir un usuario
 app.post('/usuario',function(req,res){
