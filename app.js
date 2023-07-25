@@ -659,12 +659,149 @@ app.post('/usuario',function(req,res){
     }
 });
 
-app.get('/',(req,res,next) => {
-    res.status(200).json({
-        ok:true,
-        mensaje: 'Peticion realizada correctamente'
-    })
+//Conectar
+app.get('/Producto/:id', (req, res, next) => {
+    let idTipo = req.params.id;
+    console.log('idTipo:' + idTipo);
+
+    // Consulta para obtener todos los campos de los productos con el campo tipo igual a idTipo
+    mc.query("SELECT * FROM polera WHERE tipo = ? " +
+             "UNION " +
+             "SELECT * FROM poleron WHERE tipo = ? " +
+             "UNION " +
+             "SELECT * FROM mangalarga WHERE tipo = ? " +
+             "UNION " +
+             "SELECT * FROM polo WHERE tipo = ?", [idTipo, idTipo, idTipo, idTipo], function (err, result, fields) {
+        if (err) {
+            return res.send({
+                error: true,
+                message: 'Error retrieving product data.',
+            });
+        }
+        if (result.length === 0) {
+            return res.send({
+                error: true,
+                message: 'No products found with the specified type ID.',
+            });
+        }
+        return res.send({
+            error: false,
+            data: result,
+            message: 'Products found.',
+        });
+    });
 });
+
+app.get('/color/:id', (req, res, next) => {
+    let idTipo = req.params.id;
+    console.log('idTipo:' + idTipo);
+  
+    // Consulta para obtener colores específicos para el idTipo
+    mc.query("SELECT DISTINCT color FROM polera WHERE tipo = ? " +
+             "UNION " +
+             "SELECT DISTINCT color FROM poleron WHERE tipo = ? " +
+             "UNION " +
+             "SELECT DISTINCT color FROM mangalarga WHERE tipo = ? " +
+             "UNION " +
+             "SELECT DISTINCT color FROM polo WHERE tipo = ?", [idTipo, idTipo, idTipo, idTipo], function (err, result, fields) {
+      if (err) {
+        return res.send({
+          error: true,
+          message: 'Error retrieving product data.',
+        });
+      }
+      if (result.length === 0) {
+        return res.send({
+          error: true,
+          message: 'No products found with the specified type ID.',
+        });
+      }
+  
+      // Extraer los colores únicos de los resultados
+      const colors = result.map(item => item.color);
+  
+      return res.send({
+        error: false,
+        data: colors,
+        message: 'Colors found.',
+      });
+    });
+  });
+
+  app.get('/talla/:id', (req, res, next) => {
+    let idTipo = req.params.id;
+    console.log('idTipo:' + idTipo);
+  
+    // Consulta para obtener tallas específicas para el idTipo
+    mc.query("SELECT DISTINCT talla FROM polera WHERE tipo = ? " +
+             "UNION " +
+             "SELECT DISTINCT talla FROM poleron WHERE tipo = ? " +
+             "UNION " +
+             "SELECT DISTINCT talla FROM mangalarga WHERE tipo = ? " +
+             "UNION " +
+             "SELECT DISTINCT talla FROM polo WHERE tipo = ?", [idTipo, idTipo, idTipo, idTipo], function (err, result, fields) {
+      if (err) {
+        return res.send({
+          error: true,
+          message: 'Error retrieving product data.',
+        });
+      }
+      if (result.length === 0) {
+        return res.send({
+          error: true,
+          message: 'No products found with the specified type ID.',
+        });
+      }
+  
+      // Extraer las tallas únicas de los resultados
+      const tallas = result.map(item => item.talla);
+  
+      return res.send({
+        error: false,
+        data: tallas,
+        message: 'Tallas found.',
+      });
+    });
+});
+
+
+app.get('/precio/:id', (req, res, next) => {
+    let idTipo = req.params.id;
+    console.log('idTipo:' + idTipo);
+  
+    // Consulta para obtener precios específicos para el idTipo
+    mc.query("SELECT DISTINCT precio FROM polera WHERE tipo = ? " +
+             "UNION " +
+             "SELECT DISTINCT precio FROM poleron WHERE tipo = ? " +
+             "UNION " +
+             "SELECT DISTINCT precio FROM mangalarga WHERE tipo = ? " +
+             "UNION " +
+             "SELECT DISTINCT precio FROM polo WHERE tipo = ?", [idTipo, idTipo, idTipo, idTipo], function (err, result, fields) {
+      if (err) {
+        return res.send({
+          error: true,
+          message: 'Error retrieving product data.',
+        });
+      }
+      if (result.length === 0) {
+        return res.send({
+          error: true,
+          message: 'No products found with the specified type ID.',
+        });
+      }
+  
+      // Extraer los precios únicos de los resultados
+      const precios = result.map(item => item.precio);
+  
+      return res.send({
+        error: false,
+        data: precios,
+        message: 'Precios found.',
+      });
+    });
+});
+
+
 
 //Escuchar peticiones
 app.listen(3000, ()=>{
