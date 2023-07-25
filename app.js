@@ -2,6 +2,7 @@
 var express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
+var bcrypt = require('bcrypt');
 
 //Inicializar variables
 var app = express();
@@ -543,6 +544,29 @@ app.get('/talla', function (req, res) {
         });
     });
 })
+
+//Añadir un usuario
+app.post('/usuario',function(req,res){
+    let datoUsuario = {
+        //id_usuario: campo autoincremental?
+        nombre: req.body.nombre,
+        correo: req.body.correo,
+        clave: bcrypt.hashSync(req.body.clave,10)
+    };
+    if(mc){
+        mc.query("INSERT INTO usuario SET ?", datoUsuario, function(error, result){
+            if(error){
+                return res.status(400).json({
+                    ok:false, mensaje: 'Error al crear usuario', errors:error
+                });
+            }else{
+                res.status(201).json({
+                    ok:true, usuario:result
+                });
+            }
+        });
+    }
+});
 
 app.get('/',(req,res,next) => {
     res.status(200).json({
