@@ -4,6 +4,7 @@ const mysql = require('mysql');
 const bodyParser = require('body-parser');
 var bcrypt = require('bcrypt');
 const fileUpload = require('express-fileupload');
+var jwt = require('jsonwebtoken');
 
 //Inicializar variables
 var app = express();
@@ -566,18 +567,41 @@ app.post('/login', (req, res) => {
             });
         }
         console.log(results);
-        if(!bcrypt.compareSync(body.clave, results[0].clave)){
-            return res.status(400).json({
-                ok:false, mensaje: 'Credenciales incorrectas - clave', errors: error
-            });
-        }
+        // if(!bcrypt.compareSync(body.clave, results[0].clave)){
+        //     return res.status(400).json({
+        //         ok:false, mensaje: 'Credenciales incorrectas - clave', errors: error
+        //     });
+        // }
+
+        //Crear un token!
+        let SEED = 'esta-es-una-semilla';
+        let token = jwt.sign({usuario:results[0].clave}, SEED, {expiresIn: 14400});
+
         res.status(200).json({
             ok:true,
             usuario:results,
-            id: results[0].id_usuario
+            id: results[0].id_usuario,
+            token:token
         })
     });
 });
+
+app.use('/', (req, res, next) => {
+    let token = req.query.token;
+    let SEED = 'esta-es-una-semilla';
+    console.log(token);
+    jwt.verify(token, SEED, (err, decoded) => {
+        if(err){
+            return res.status(401).json({
+                ok:false,
+                mensaje: 'Token incorrecto',
+                errors:err
+            });
+        }
+        req.usuario = decoded.usuario;
+        next();
+    })
+})
 
 //Añadir un usuario
 app.post('/usuario',function(req,res){
