@@ -600,11 +600,11 @@ app.post('/login', (req, res) => {
             });
         }
         console.log(results);
-        // if(!bcrypt.compareSync(body.clave, results[0].clave)){
-        //     return res.status(400).json({
-        //         ok:false, mensaje: 'Credenciales incorrectas - clave', errors: error
-        //     });
-        // }
+        if(!bcrypt.compareSync(body.clave, results[0].clave)){
+             return res.status(400).json({
+                 ok:false, mensaje: 'Credenciales incorrectas - clave', errors: error
+             });
+        }
 
         //Crear un token!
         let SEED = 'esta-es-una-semilla';
@@ -619,22 +619,22 @@ app.post('/login', (req, res) => {
     });
 });
 
-app.use('/', (req, res, next) => {
-    let token = req.query.token;
-    let SEED = 'esta-es-una-semilla';
-    console.log(token);
-    jwt.verify(token, SEED, (err, decoded) => {
-        if(err){
-            return res.status(401).json({
-                ok:false,
-                mensaje: 'Token incorrecto',
-                errors:err
-            });
-        }
-        req.usuario = decoded.usuario;
-        next();
-    })
-})
+// app.use('/', (req, res, next) => {
+//     let token = req.query.token;
+//     let SEED = 'esta-es-una-semilla';
+//     console.log(token);
+//     jwt.verify(token, SEED, (err, decoded) => {
+//         if(err){
+//             return res.status(401).json({
+//                 ok:false,
+//                 mensaje: 'Token incorrecto',
+//                 errors:err
+//             });
+//         }
+//         req.usuario = decoded.usuario;
+//         next();
+//     })
+// })
 
 //Añadir un usuario
 app.post('/usuario',function(req,res){
