@@ -1007,6 +1007,106 @@ app.get('/allproduct', (req,res) => {
     })    
 })
 
+//Recuperar las poleras para el CRUD
+app.get('/allpoleras',(req,res) => {
+    mc.query("SELECT imagen, tipo, precio, stock FROM polera", function(error,results,fields){
+        if(error){
+            return res.status(500).json({
+                error: true,
+                message:'Error al obtener los datos'
+            })
+        }
+        res.json({
+            error:false,
+            data:results
+        })
+    })
+})
+
+app.post('/agregarstockpolera', (req,res) => {
+    console.log(req.body);
+    const id = req.body;
+    console.log('ID recibido', id);
+    mc.query(`UPDATE polera SET stock = stock + 1 WHERE idpolera = ${id}`,function(error, results, fields){
+        if(error){
+            return res.status(500).json({
+                error:true,
+                message:'Error al agregar stock a la polera'
+            });
+        }
+        res.json({
+            error:false,
+            message:'Stock agregado exitosamente'
+        })
+    })
+})
+
+app.post('/disminuirstockpolera', (req, res) => {
+    const { id } = req.body;
+  
+    mc.query(`UPDATE polera SET stock = stock - 1 WHERE id = '${id}'`, (error, results, fields) => {
+      if (error) {
+        return res.status(500).json({
+          error: true,
+          message: 'Error al disminuir el stock de la polera'
+        });
+      }
+  
+      res.json({
+        error: false,
+        message: 'Stock disminuido exitosamente'
+      });
+    });
+  });
+
+//Recuperar las mangalarga para el CRUD
+app.get('/allmangalarga',(req,res) => {
+    mc.query("SELECT imagen, tipo, precio, stock FROM mangalarga", function(error,results,fields){
+        if(error){
+            return res.status(500).json({
+                error: true,
+                message:'Error al obtener los datos'
+            })
+        }
+        res.json({
+            error:false,
+            data:results
+        })
+    })
+})
+
+//Recuperar los polerones para el CRUD
+app.get('/allpoleron',(req,res) => {
+    mc.query("SELECT imagen, tipo, precio, stock FROM poleron", function(error,results,fields){
+        if(error){
+            return res.status(500).json({
+                error: true,
+                message:'Error al obtener los datos'
+            })
+        }
+        res.json({
+            error:false,
+            data:results
+        })
+    })
+})
+
+//Recuperar los polos para el CRUD
+app.get('/allpolo',(req,res) => {
+    mc.query("SELECT imagen, tipo, precio, stock FROM polo", function(error,results,fields){
+        if(error){
+            return res.status(500).json({
+                error: true,
+                message:'Error al obtener los datos'
+            })
+        }
+        res.json({
+            error:false,
+            data:results
+        })
+    })
+})
+
 //Escuchar peticiones
 app.listen(3000, ()=>{
     console.log('Express Server - puerto 3000 online');
