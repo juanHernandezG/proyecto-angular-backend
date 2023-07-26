@@ -1009,6 +1009,8 @@ app.get('/allproduct', (req,res) => {
     })    
 })
 
+
+
 //Escuchar peticiones
 app.listen(3000, ()=>{
     console.log('Express Server - puerto 3000 online');
