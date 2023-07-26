@@ -577,6 +577,132 @@ app.get('/poleron', function (req, res) {
     });
 })
 
+//Agregar color
+app.post('/agregarcolor', function (req, res) {
+    let datosColor = {
+        idcolor: req.body.idcolor,
+        tipo: req.body.tipo,
+        color: req.body.color,
+        imagen: req.body.imagen
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO color SET ?", datosColor, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar el color"});
+            } else {
+                res.status(201).json({"Mensaje": "Color insertado correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar color
+app.delete('/borrarcolor/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM color WHERE idcolor = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar color
+app.put('/actualizarpoleron/:id', (req, res) =>{
+    let id = req.params.id;
+    let colores = req.body;
+    console.log(id);
+    console.log(colores);
+    if (!id || !colores){
+        return res.status(400).send({error: colores, message: 'Debe proveer un id y los datos de un color'});
+    }
+    mc.query("UPDATE color SET ? WHERE idcolor = ?", [colores, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todos los colores
+app.get('/color', function (req, res) {
+    mc.query('SELECT * FROM color', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de colores pedida.'
+        });
+    });
+})
+
+//Agregar color
+app.post('/agregarcolorml', function (req, res) {
+    let datosColor = {
+        idcolor: req.body.idcolor,
+        tipo: req.body.tipo,
+        color: req.body.color,
+        imagen: req.body.imagen
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO colorml SET ?", datosColor, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar el color"});
+            } else {
+                res.status(201).json({"Mensaje": "Color insertado correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar color
+app.delete('/borrarcolorml/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM colorml WHERE idcolor = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar color
+app.put('/actualizarcolorml/:id', (req, res) =>{
+    let id = req.params.id;
+    let colores = req.body;
+    console.log(id);
+    console.log(colores);
+    if (!id || !colores){
+        return res.status(400).send({error: colores, message: 'Debe proveer un id y los datos de un color'});
+    }
+    mc.query("UPDATE colorml SET ? WHERE idcolor = ?", [colores, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todos los colores
+app.get('/colorml', function (req, res) {
+    mc.query('SELECT * FROM colorml', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de colores pedida.'
+        });
+    });
+})
+
 //Agregar polo
 app.post('/agregarpolo', function (req, res) {
     let datosPolo = {
