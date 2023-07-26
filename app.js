@@ -14,14 +14,16 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(fileUpload());
 
 //CORS Middleware
-app.use(function(req, res, next){
+app.use(function (req, res, next) {
     //Enabling CORS
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Aceess-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers",
-                    "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization"
+    );
     next();
-});
+  });
 
 
 
