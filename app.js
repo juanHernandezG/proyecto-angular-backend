@@ -23,6 +23,8 @@ app.use(function(req, res, next){
     next();
 });
 
+
+
 //Configuracion de la conexion
 const mc = mysql.createConnection({
     host: 'localhost',
@@ -182,6 +184,67 @@ app.get('/diseno', function (req, res) {
             error: false,
             data: results,
             message: 'Lista de diseños.'
+        });
+    });
+})
+
+//Agregar tallas
+app.post('/agregartallas', function (req, res) {
+    let datosTalla = {
+        idtalla: req.body.idtalla,
+        talla: req.body.talla
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO talla SET ?", datosTalla, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar la talla"});
+            } else {
+                res.status(201).json({"Mensaje": "Talla insertado correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar talla
+app.delete('/borrartalla/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM talla WHERE idtalla = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar diseño
+app.put('/actualizartalla/:id', (req, res) =>{
+    let id = req.params.id;
+    let talla = req.body;
+    console.log(id);
+    console.log(talla);
+    if (!id || !talla){
+        return res.status(400).send({error: talla, message: 'Debe proveer un id y los datos de un talla'});
+    }
+    mc.query("UPDATE talla SET ? WHERE idtalla = ?", [talla, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todos los diseños
+app.get('/talla', function (req, res) {
+    mc.query('SELECT * FROM talla', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de talla.'
         });
     });
 })
@@ -660,7 +723,7 @@ app.post('/usuario',function(req,res){
 });
 
 //Conectar
-app.get('/Producto/:id', (req, res, next) => {
+app.get('/producto/:id', (req, res, next) => {
     let idTipo = req.params.id;
     console.log('idTipo:' + idTipo);
 
@@ -675,13 +738,13 @@ app.get('/Producto/:id', (req, res, next) => {
         if (err) {
             return res.send({
                 error: true,
-                message: 'Error retrieving product data.',
+                message: 'Error.',
             });
         }
         if (result.length === 0) {
             return res.send({
                 error: true,
-                message: 'No products found with the specified type ID.',
+                message: '',
             });
         }
         return res.send({
@@ -696,7 +759,6 @@ app.get('/color/:id', (req, res, next) => {
     let idTipo = req.params.id;
     console.log('idTipo:' + idTipo);
   
-    // Consulta para obtener colores específicos para el idTipo
     mc.query("SELECT DISTINCT color FROM polera WHERE tipo = ? " +
              "UNION " +
              "SELECT DISTINCT color FROM poleron WHERE tipo = ? " +
@@ -707,13 +769,13 @@ app.get('/color/:id', (req, res, next) => {
       if (err) {
         return res.send({
           error: true,
-          message: 'Error retrieving product data.',
+          message: '.',
         });
       }
       if (result.length === 0) {
         return res.send({
           error: true,
-          message: 'No products found with the specified type ID.',
+          message: 'No hay productos.',
         });
       }
   
@@ -723,7 +785,7 @@ app.get('/color/:id', (req, res, next) => {
       return res.send({
         error: false,
         data: colors,
-        message: 'Colors found.',
+        message: 'Se encontró.',
       });
     });
   });
