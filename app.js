@@ -989,7 +989,23 @@ app.get('/precio/:id', (req, res, next) => {
     });
 });
 
+//Recuperar todos los productos de la bdd
+app.get('/allproduct', (req,res) => {
+    const query = 'SELECT idpolera, polera AS tipo, imagen, precio, stock FROM polera UNION ALL SELECT idmangalarga, mangalarga AS tipo, imagen, precio, stock FROM mangalarga UNION ALL SELECT idpoleron, poleron AS tipo, imagen, precio, stock FROM poleron UNION ALL SELECT idpolo, polo AS tipo, imagen, precio, stock FROM polo;';
 
+    mc.query("SELECT idpolera, 'polera' AS tipo, imagen, precio, stock FROM polera UNION ALL SELECT idmangalarga, 'mangalarga' AS tipo, imagen, precio, stock FROM mangalarga UNION ALL SELECT idpoleron, 'poleron' AS tipo, imagen, precio, stock FROM poleron UNION ALL SELECT idpolo, 'polo' AS tipo, imagen, precio, stock FROM polo",function(error, results,fields){
+        if(error){
+            return res.status(500).json({
+                error: true,
+                message: 'Error al obtener los datos'
+            });
+        }
+        res.json({
+            error:false,
+            data:results
+        })
+    })    
+})
 
 //Escuchar peticiones
 app.listen(3000, ()=>{
