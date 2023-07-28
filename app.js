@@ -43,15 +43,13 @@ mc.connect();
 //Agregar productos
 app.post('/agregarproducto', function (req, res) {
     let datosProducto = {
-        idproducto: req.body.idproducto,
-        cantidad: req.body.cantidad,
-        tipoid: req.body.tipoid,
-        color: req.body.color,
+        idtipo: req.body.idtipo,
+        precio: req.body.precio,
         talla: req.body.talla,
-        disenoid: req.body.disenoid,
-        imagenprenda: req.body.imagenprenda,
-        imagendiseno: req.body.imagendiseno,
-        precio: req.body.precio
+        color: req.body.color,
+        cantidad: req.body.cantidad,
+        imagen: req.body.imagen,
+        diseno: req.body.diseno
     };
 
     if (mc) {
