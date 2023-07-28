@@ -1109,6 +1109,72 @@ app.get('/allpolo',(req,res) => {
     })
 })
 
+//Agregar prod
+app.post('/agregarprod', function (req, res) {
+    let datosProd = {
+        idprod: req.body.idprod,
+        tipo: req.body.tipo,
+        color: req.body.color,
+        talla: req.body.talla,
+        precio: req.body.precio,
+        stock: req.body.stock,
+        imagen: req.body.imagen
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO prod SET ?", datosProd, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar el producto"});
+            } else {
+                res.status(201).json({"Mensaje": "Producto insertado correctamente"});
+            }
+        });
+    }
+});
+
+//Borrar prod
+app.delete('/borrarprod/:id', function (req, res){
+    let id = req.params.id;
+    if(mc){
+        console.log(id);
+        mc.query("DELETE FROM prod WHERE idprod = ?", id, function (error, result){
+            if(error){
+                return res.status(500).json({"Mensaje": "Error"});
+            }
+            else{
+                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+            }
+        });
+    }
+});
+
+//Actualizar prod
+app.put('/actualizarprod/:id', (req, res) =>{
+    let id = req.params.id;
+    let producto = req.body;
+    console.log(id);
+    console.log(producto);
+    if (!id || !producto){
+        return res.status(400).send({error: producto, message: 'Debe proveer un id y los datos de un producto'});
+    }
+    mc.query("UPDATE prod SET ? WHERE idprod = ?", [producto, id], function (error, results, fields){
+        if (error) throw error;
+        return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
+    });
+});
+
+//Recuperar todos los prod
+app.get('/prod', function (req, res) {
+    mc.query('SELECT * FROM prod', function(error, results, fields){
+        if(error) throw error;
+        return res.send({
+            error: false,
+            data: results,
+            message: 'Lista de productos.'
+        });
+    });
+})
+
 
 
 //Escuchar peticiones
