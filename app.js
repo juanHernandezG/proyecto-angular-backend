@@ -25,8 +25,6 @@ app.use(function (req, res, next) {
     next();
   });
 
-
-
 //Configuracion de la conexion
 const mc = mysql.createConnection({
     host: 'localhost',
@@ -43,41 +41,94 @@ mc.connect();
 //Agregar productos
 app.post('/agregarproducto', function (req, res) {
     let datosProducto = {
-        idtipo: req.body.idtipo,
-        precio: req.body.precio,
-        talla: req.body.talla,
-        color: req.body.color,
-        cantidad: req.body.cantidad,
-        imagen: req.body.imagen,
-        diseno: req.body.diseno
+      idtipo: req.body.idtipo,
+      precio: req.body.precio,
+      talla: req.body.talla,
+      color: req.body.color,
+      cantidad: req.body.cantidad,
+      imagen: req.body.imagen,
+      diseno: req.body.diseno
     };
-
+  
     if (mc) {
-        mc.query("INSERT INTO producto SET ?", datosProducto, function (error, result) {
-            if (error) {
-                res.status(500).json({"Mensaje": "Error al insertar el producto"});
+      // Verificar si el producto ya existe en la base de datos
+      mc.query("SELECT * FROM producto WHERE talla = ? AND color = ? AND diseno = ?",
+        [datosProducto.talla, datosProducto.color, datosProducto.diseno],
+        function (error, result) {
+          if (error) {
+            res.status(500).json({ "Mensaje": "Error al verificar el producto" });
+          } else {
+            if (result.length > 0) {
+              // Si el producto existe, actualizar la cantidad
+              let cantidadActual = result[0].cantidad;
+              let nuevaCantidad = cantidadActual + datosProducto.cantidad;
+  
+              mc.query("UPDATE producto SET cantidad = ? WHERE talla = ? AND color = ? AND diseno = ?",
+                [nuevaCantidad, datosProducto.talla, datosProducto.color, datosProducto.diseno],
+                function (error, result) {
+                  if (error) {
+                    res.status(500).json({ "Mensaje": "Error al actualizar la cantidad del producto" });
+                  } else {
+                    res.status(200).json({ "Mensaje": "Cantidad del producto actualizada" });
+                  }
+                });
             } else {
-                res.status(201).json({"Mensaje": "Producto insertado correctamente"});
+              // Si el producto no existe, insertarlo en la base de datos
+              mc.query("INSERT INTO producto SET ?", datosProducto, function (error, result) {
+                if (error) {
+                  res.status(500).json({ "Mensaje": "Error al insertar el producto" });
+                } else {
+                  res.status(201).json({ "Mensaje": "Producto insertado correctamente" });
+                }
+              });
             }
+          }
         });
     }
-});
+  });
+
+  // Elimina la lógica de la consulta a la base de datos en el endpoint /cantidadtotalproductos
+app.get('/cantidadtotalproductos', function (req, res) {
+    res.status(200).json({ "cantidadTotal": 0 }); // El valor 0 es solo un valor predeterminado, puedes ajustarlo si lo deseas.
+  });
 
 //Borrar producto
-app.delete('/borrarproducto/:id', function (req, res){
+app.delete('/borrarproducto/:id', function (req, res) {
     let id = req.params.id;
-    if(mc){
-        console.log(id);
-        mc.query("DELETE FROM producto WHERE idproducto = ?", id, function (error, result){
-            if(error){
-                return res.status(500).json({"Mensaje": "Error"});
-            }
-            else{
-                return res.status(200).json({"Mensaje": "Registro con id = " + id + " Borrado"});
+    if (mc) {
+        mc.query("SELECT cantidad FROM producto WHERE idproducto = ?", id, function (error, result) {
+            if (error) {
+                return res.status(500).json({ "Mensaje": "Error al obtener la cantidad del producto" });
+            } else {
+                if (result.length === 0) {
+                    return res.status(404).json({ "Mensaje": "Producto no encontrado" });
+                }
+
+                let cantidadActual = result[0].cantidad;
+                if (cantidadActual > 1) {
+                    // Si la cantidad es mayor a 1, reducir la cantidad en 1
+                    mc.query("UPDATE producto SET cantidad = cantidad - 1 WHERE idproducto = ?", id, function (error, result) {
+                        if (error) {
+                            return res.status(500).json({ "Mensaje": "Error al actualizar la cantidad del producto" });
+                        } else {
+                            return res.status(200).json({ "Mensaje": "Cantidad del producto con id = " + id + " actualizada" });
+                        }
+                    });
+                } else {
+                    // Si la cantidad es 1 o menos, eliminar el producto
+                    mc.query("DELETE FROM producto WHERE idproducto = ?", id, function (error, result) {
+                        if (error) {
+                            return res.status(500).json({ "Mensaje": "Error al eliminar el producto" });
+                        } else {
+                            return res.status(200).json({ "Mensaje": "Registro con id = " + id + " Borrado" });
+                        }
+                    });
+                }
             }
         });
     }
 });
+
 
 //Actualizar producto
 app.put('/actualizarproducto/:id', (req, res) =>{
