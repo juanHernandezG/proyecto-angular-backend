@@ -129,7 +129,6 @@ app.delete('/borrarproducto/:id', function (req, res) {
     }
 });
 
-
 //Actualizar producto
 app.put('/actualizarproducto/:id', (req, res) =>{
     let id = req.params.id;
@@ -144,6 +143,33 @@ app.put('/actualizarproducto/:id', (req, res) =>{
         return res.status(200).json({"Mensaje": "Registro con id = " + id + " ha sido actualizado"});
     });
 });
+
+app.put('/actualizarstock', (req, res) => {
+    const tipo = req.body.tipo;
+    const color = req.body.color;
+    const talla = req.body.talla;
+    const nuevoStock = req.body.stock;
+  
+    if (!tipo || !color || !talla || nuevoStock === undefined || nuevoStock === null) {
+      return res.status(400).json({ "Mensaje": "Debe proveer el color, la talla y el nuevo valor de stock" });
+    }
+  
+    // Aquí es donde se realiza la actualización del stock en la base de datos
+    mc.query("UPDATE prod SET stock = ? WHERE tipo = ? AND color = ? AND talla = ?", [nuevoStock, tipo, color, talla], function (error, result) {
+      if (error) {
+        return res.status(500).json({ "Mensaje": "Error al actualizar el stock del producto" });
+      }
+  
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ "Mensaje": "No se encontró ningún producto con el color y talla proporcionados" });
+      }
+  
+      return res.status(200).json({ "Mensaje": `Stock del producto con idprod ${tipo}, con color ${color} y talla ${talla} actualizado correctamente` });
+    });
+  });
+  
+  
+  
 
 //Recuperar todos los productos
 app.get('/producto', function (req, res) {
