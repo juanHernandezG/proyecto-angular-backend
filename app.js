@@ -285,6 +285,40 @@ app.get('/stock', (req, res) => {
       });
     });
   });
+
+  app.get('/tallacolor', (req, res) => {
+    const idtipo = req.query.idtipo;
+    const color = req.query.color;
+  
+    if (!idtipo || !color) {
+      return res.status(400).json({ "Mensaje": "Debe proveer el idtipo y el color en la URL" });
+    }
+  
+    // Aquí es donde se realiza la obtención de las tallas en la base de datos
+    mc.query('SELECT DISTINCT talla FROM prod WHERE tipo = ? AND color = ?', [idtipo, color], function (error, results, fields) {
+      if (error) {
+        return res.status(500).json({
+          error: true,
+          message: 'Error al obtener los datos'
+        });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({
+          error: true,
+          message: 'No se encontró la combinación de tipo y color proporcionada'
+        });
+      }
+  
+      const tallas = results.map(result => result.talla); // Obtener todas las tallas del resultado
+  
+      res.json({
+        error: false,
+        tallas: tallas
+      });
+    });
+  });
+  
+  
   
 
 //Recuperar todos los diseños
