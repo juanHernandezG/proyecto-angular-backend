@@ -253,6 +253,40 @@ app.put('/actualizardiseno/:id', (req, res) =>{
     });
 });
 
+app.get('/stock', (req, res) => {
+    const idtipo = req.query.idtipo;
+    const color = req.query.color;
+    const talla = req.query.talla;
+  
+    if (!idtipo || !color || !talla) {
+      return res.status(400).json({ "Mensaje": "Debe proveer el idtipo, color y la talla en la URL" });
+    }
+  
+    // Aquí es donde se realiza la obtención del stock en la base de datos
+    mc.query('SELECT stock FROM prod WHERE tipo = ? AND color = ? AND talla = ?', [idtipo, color, talla], function (error, results, fields) {
+      if (error) {
+        return res.status(500).json({
+          error: true,
+          message: 'Error al obtener los datos'
+        });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({
+          error: true,
+          message: 'No se encontró el stock para la combinación de tipo, color y talla proporcionada'
+        });
+      }
+  
+      const stock = results[0].stock; // Obtener el stock del primer resultado
+  
+      res.json({
+        error: false,
+        stock: stock
+      });
+    });
+  });
+  
+
 //Recuperar todos los diseños
 app.get('/diseno', function (req, res) {
     mc.query('SELECT * FROM diseno', function(error, results, fields){
