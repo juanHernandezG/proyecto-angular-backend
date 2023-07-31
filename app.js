@@ -1334,9 +1334,10 @@ app.get('/prodAll', (req,res) => {
     });
 });
 //Intento de aumentar el stock de prod
-app.post('/prodaumentarStock/:idprod', (req,res) =>{
+app.put('/prodaumentarStock/:idprod', (req,res) =>{
     const idprod = req.params.idprod;
-    mc.query("UPDATE prod SET stock = stock + 1 WHERE idprod = ?", [idprod], (error, results, fields) =>{
+    const nuevoStock = req.body.stock;
+    mc.query("UPDATE prod SET stock = stock + ? WHERE idprod = ?", [nuevoStock, idprod], (error, results, fields) =>{
         if(error){
             return res.status(500).json({
                 error: true,
