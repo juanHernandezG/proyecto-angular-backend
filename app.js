@@ -1168,41 +1168,41 @@ app.get('/allpoleras',(req,res) => {
     })
 })
 
-app.post('/agregarstockpolera', (req,res) => {
-    console.log(req.body);
-    const id = req.body;
-    console.log('ID recibido', id);
-    mc.query(`UPDATE polera SET stock = stock + 1 WHERE idpolera = ${id}`,function(error, results, fields){
-        if(error){
-            return res.status(500).json({
-                error:true,
-                message:'Error al agregar stock a la polera'
-            });
-        }
-        res.json({
-            error:false,
-            message:'Stock agregado exitosamente'
-        })
-    })
-})
+// app.post('/agregarstockpolera', (req,res) => {
+//     console.log(req.body);
+//     const id = req.body;
+//     console.log('ID recibido', id);
+//     mc.query(`UPDATE polera SET stock = stock + 1 WHERE idpolera = ${id}`,function(error, results, fields){
+//         if(error){
+//             return res.status(500).json({
+//                 error:true,
+//                 message:'Error al agregar stock a la polera'
+//             });
+//         }
+//         res.json({
+//             error:false,
+//             message:'Stock agregado exitosamente'
+//         })
+//     })
+// })
 
-app.post('/disminuirstockpolera', (req, res) => {
-    const { id } = req.body;
+// app.post('/disminuirstockpolera', (req, res) => {
+//     const { id } = req.body;
   
-    mc.query(`UPDATE polera SET stock = stock - 1 WHERE id = '${id}'`, (error, results, fields) => {
-      if (error) {
-        return res.status(500).json({
-          error: true,
-          message: 'Error al disminuir el stock de la polera'
-        });
-      }
+//     mc.query(`UPDATE polera SET stock = stock - 1 WHERE id = '${id}'`, (error, results, fields) => {
+//       if (error) {
+//         return res.status(500).json({
+//           error: true,
+//           message: 'Error al disminuir el stock de la polera'
+//         });
+//       }
   
-      res.json({
-        error: false,
-        message: 'Stock disminuido exitosamente'
-      });
-    });
-  });
+//       res.json({
+//         error: false,
+//         message: 'Stock disminuido exitosamente'
+//       });
+//     });
+//   });
 
 //Recuperar las mangalarga para el CRUD
 app.get('/allmangalarga',(req,res) => {
@@ -1318,7 +1318,37 @@ app.get('/prod', function (req, res) {
     });
 })
 
-
+//Recuperar todos los prod tipo, color, talla, precio, stock,imagen,
+app.get('/prodAll', (req,res) => {
+    mc.query("SELECT * FROM prod", function(error, results, fields){
+        if(error){
+            return res.status(500).json({
+                error: true,
+                message: 'Error al obtener la tabla prod'
+            });
+        }
+        res.json({
+            error: false,
+            data: results,
+        });
+    });
+});
+//Intento de aumentar el stock de prod
+app.post('/prodaumentarStock/:idprod', (req,res) =>{
+    const idprod = req.params.idprod;
+    mc.query("UPDATE prod SET stock = stock + 1 WHERE idprod = ?", [idprod], (error, results, fields) =>{
+        if(error){
+            return res.status(500).json({
+                error: true,
+                message: 'Error al aumentar stock'
+            });
+        }
+        res.json({
+            error: false,
+            message: 'Stock aumentado exitosamente'
+        })
+    })
+})
 
 //Escuchar peticiones
 app.listen(3000, ()=>{
