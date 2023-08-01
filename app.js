@@ -1306,6 +1306,47 @@ app.put('/actualizarprod/:id', (req, res) =>{
     });
 });
 
+
+// Ruta para actualizar el stock de un producto por idprod
+app.put('/actualizarstock/:idprod', (req, res) => {
+    const idprod = req.params.idprod;
+    const nuevoStock = req.body.stock;
+  
+    if (!idprod || nuevoStock === undefined) {
+      return res.status(400).json({ error: 'Debe proporcionar el idprod y el nuevo stock' });
+    }
+  
+    mc.query('UPDATE prod SET stock = ? WHERE idprod = ?', [nuevoStock, idprod], (error, results, fields) => {
+      if (error) {
+        console.error('Error al actualizar el stock del producto:', error);
+        return res.status(500).json({ error: 'Error al actualizar el stock del producto' });
+      }
+  
+      return res.status(200).json({ mensaje: `Stock del producto con idprod = ${idprod} actualizado exitosamente` });
+    });
+  });
+
+  // Ruta para actualizar el precio de un producto por idprod
+app.put('/actualizarprecio/:idprod', (req, res) => {
+    const idprod = req.params.idprod;
+    const nuevoprecio = req.body.precio;
+  
+    if (!idprod || nuevoprecio === undefined) {
+      return res.status(400).json({ error: 'Debe proporcionar el idprod y el nuevo precio' });
+    }
+  
+    mc.query('UPDATE prod SET precio = ? WHERE idprod = ?', [nuevoprecio, idprod], (error, results, fields) => {
+      if (error) {
+        console.error('Error al actualizar el precio del producto:', error);
+        return res.status(500).json({ error: 'Error al actualizar el precio del producto' });
+      }
+  
+      return res.status(200).json({ mensaje: `precio del producto con idprod = ${idprod} actualizado exitosamente` });
+    });
+  });
+  
+
+
 //Recuperar todos los prod
 app.get('/prod', function (req, res) {
     mc.query('SELECT * FROM prod', function(error, results, fields){
