@@ -419,23 +419,22 @@ app.post('/agregarenvio', function (req, res) {
     }
 });
 
-app.delete('/eliminarproductoscarrito/:id', (req, res) => {
-    const idProducto = req.params.id;
+app.put('/desactivarenvio/:idenvio', (req, res) => {
+    const idenvio = req.params.idenvio;
   
-    // Consulta para eliminar el producto del carrito en base al ID recibido
-    const sql = `DELETE FROM producto WHERE idproducto = ${idProducto}`;
+    // Consulta para desactivar el envío en base al idenvio recibido
+    const sql = 'UPDATE envio SET desactivado = true WHERE idenvio = ?';
   
-    connection.query(sql, (error, results) => {
+    connection.query(sql, [idenvio], (error, result) => {
       if (error) {
-        console.error('Error al eliminar el producto del carrito:', error);
-        res.status(500).json({ mensaje: 'Error al eliminar el producto del carrito' });
+        console.error('Error al desactivar el envío:', error);
+        res.status(500).json({ mensaje: 'Error al desactivar el envío' });
       } else {
-        console.log('Producto del carrito eliminado correctamente');
-        res.status(200).json({ mensaje: 'Producto del carrito eliminado correctamente' });
+        console.log('Envío desactivado correctamente');
+        res.status(200).json({ mensaje: 'Envío desactivado correctamente' });
       }
     });
   });
-  
   
 
 //Borrar envio
@@ -1458,6 +1457,57 @@ app.post('/agregarventa', function (req, res) {
         });
     }
 });
+
+app.post('/guardarventa/:idenvio', (req, res) => {
+    const idenvio = req.params.idenvio;
+  
+    // Consulta para guardar el idenvio en la tabla de ventas
+    const sql = 'INSERT INTO ventas (idenvio) VALUES (?)';
+  
+    connection.query(sql, [idenvio], (error, result) => {
+      if (error) {
+        console.error('Error al guardar el idenvio en la tabla de ventas:', error);
+        res.status(500).json({ mensaje: 'Error al guardar el idenvio en la tabla de ventas' });
+      } else {
+        console.log('Idenvio guardado en tabla de ventas correctamente');
+        res.status(201).json({ mensaje: 'Idenvio guardado en tabla de ventas correctamente' });
+      }
+    });
+  });
+
+  app.post('/venta/:idenvio', (req, res) => {
+    let idenvio = req.params.idenvio;
+    let venta = req.body;
+    console.log(idenvio);
+    console.log(venta);
+    if (!idenvio || !venta) {
+        return res.status(400).send({ error: venta, message: 'Debe proveer un idenvio y los datos de una venta' });
+    }
+
+    // La consulta SQL solo incluye el valor del idenvio, ya que idventa se generará automáticamente.
+    mc.query("INSERT INTO ventas (idenvio) VALUES (?)", [idenvio], function (error, results, fields) {
+        if (error) throw error;
+        return res.status(200).json({ "Mensaje": "Registro con idenvio = " + idenvio + " ha sido insertado en la tabla ventas" });
+    });
+});
+
+app.get('/existeventa/:idenvio', (req, res) => {
+    const idenvio = req.params.idenvio;
+    const query = 'SELECT COUNT(*) AS count FROM ventas WHERE idenvio = ?';
+  
+    connection.query(query, [idenvio], (error, results, fields) => {
+      if (error) {
+        console.error('Error al consultar la base de datos:', error);
+        return res.status(500).json({ error: 'Error en el servidor' });
+      }
+  
+      const count = results[0].count;
+      const existeEnVentas = count > 0;
+  
+      res.json({ existeEnVentas });
+    });
+  });
+
 
 //Escuchar peticiones
 app.listen(3000, ()=>{
