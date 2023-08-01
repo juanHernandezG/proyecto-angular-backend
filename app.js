@@ -405,19 +405,38 @@ app.post('/agregarenvio', function (req, res) {
         ciudad: req.body.ciudad,
         direccion: req.body.direccion,
         celular: req.body.celular,
-        correo: req.body.correo,
+        correo: req.body.correo
     };
 
     if (mc) {
         mc.query("INSERT INTO envio SET ?", datosEnvio, function (error, result) {
             if (error) {
-                res.status(500).json({"Mensaje": "Error al insertar el pedido"});
+                res.status(500).json({"Mensaje": "Error al insertar envio"});
             } else {
-                res.status(201).json({"Mensaje": "Pedido insertado correctamente"});
+                res.status(201).json({"Mensaje": "Envio insertado correctamente"});
             }
         });
     }
 });
+
+app.delete('/eliminarproductoscarrito/:id', (req, res) => {
+    const idProducto = req.params.id;
+  
+    // Consulta para eliminar el producto del carrito en base al ID recibido
+    const sql = `DELETE FROM producto WHERE idproducto = ${idProducto}`;
+  
+    connection.query(sql, (error, results) => {
+      if (error) {
+        console.error('Error al eliminar el producto del carrito:', error);
+        res.status(500).json({ mensaje: 'Error al eliminar el producto del carrito' });
+      } else {
+        console.log('Producto del carrito eliminado correctamente');
+        res.status(200).json({ mensaje: 'Producto del carrito eliminado correctamente' });
+      }
+    });
+  });
+  
+  
 
 //Borrar envio
 app.delete('/borrarenvio/:id', function (req, res){
@@ -1392,29 +1411,7 @@ app.put('/prodaumentarStock/:idprod', (req,res) =>{
     })
 })
 
-// Agregar envío
-app.post('/agregarenvio', function (req, res) {
-    let datosEnvio = {
-      productosid: req.body.productosid,
-      nombre: req.body.nombre,
-      apellido: req.body.apellido,
-      rut: req.body.rut,
-      ciudad: req.body.ciudad,
-      direccion: req.body.direccion,
-      celular: req.body.celular,
-      correo: req.body.correo,
-    };
-  
-    if (mc) {
-      mc.query("INSERT INTO envio SET ?", datosEnvio, function (error, result) {
-        if (error) {
-          res.status(500).json({ "Mensaje": "Error al insertar el envío" });
-        } else {
-          res.status(201).json({ "Mensaje": "Envío insertado correctamente" });
-        }
-      });
-    }
-  });
+
 
   // Obtener todos los envíos
 app.get('/envios', function (req, res) {
@@ -1428,6 +1425,40 @@ app.get('/envios', function (req, res) {
         });
     }
 });
+
+//Agregar diseños
+app.post('/agregarventa', function (req, res) {
+    let datosVenta = {
+        idventa: req.body.idventa,
+        fecha: req.body.fecha,
+        total: req.body.total,
+        idenvio: req.body.idenvio
+    };
+
+    if (mc) {
+        mc.query("INSERT INTO venta SET ?", datosVenta, function (error, result) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al insertar venta"});
+            } else {
+                res.status(201).json({"Mensaje": "Diseño insertado correctamente"});
+            }
+        });
+    }
+});
+
+  // Obtener todos las ventas
+  app.get('/venta', function (req, res) {
+    if (mc) {
+        mc.query('SELECT * FROM venta', function (error, results, fields) {
+            if (error) {
+                res.status(500).json({"Mensaje": "Error al obtener las ventas"});
+            } else {
+                res.status(200).json(results);
+            }
+        });
+    }
+});
+
 //Escuchar peticiones
 app.listen(3000, ()=>{
     console.log('Express Server - puerto 3000 online');
